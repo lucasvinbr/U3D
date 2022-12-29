@@ -69,7 +69,7 @@ namespace tracy
 
 		// In-progress payload.
 		uint32_t m_queryLimit = MaxQueries;
-		uint32_t m_queryCounter = 0;
+		std::atomic<uint32_t> m_queryCounter = 0;
 		uint32_t m_previousQueryCounter = 0;
 
 		uint32_t m_activePayload = 0;
@@ -91,10 +91,8 @@ namespace tracy
 			{
 				D3D12_FEATURE_DATA_D3D12_OPTIONS3 featureData{};
 
-				if (FAILED(device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS3, &featureData, sizeof(featureData))))
-				{
-					assert(false && "Platform does not support profiling of copy queues.");
-				}
+				bool Success = SUCCEEDED(device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS3, &featureData, sizeof(featureData)));
+				assert(Success && featureData.CopyQueueTimestampQueriesSupported && "Platform does not support profiling of copy queues.");
 			}
 
 			uint64_t timestampFrequency;
@@ -181,9 +179,9 @@ namespace tracy
 
 		void NewFrame()
 		{
-			m_payloadQueue.emplace(D3D12QueryPayload{ m_previousQueryCounter, m_queryCounter });
-			m_previousQueryCounter += m_queryCounter;
-			m_queryCounter = 0;
+			uint32_t queryCounter = m_queryCounter.exchange(0);
+			m_payloadQueue.emplace(D3D12QueryPayload{ m_previousQueryCounter, queryCounter });
+			m_previousQueryCounter += queryCounter;
 
 			if (m_previousQueryCounter >= m_queryLimit)
 			{
@@ -299,10 +297,10 @@ namespace tracy
 	private:
 		tracy_force_inline uint32_t NextQueryId()
 		{
-			assert(m_queryCounter < m_queryLimit && "Submitted too many GPU queries! Consider increasing MaxQueries.");
+			uint32_t queryCounter = m_queryCounter.fetch_add(2);
+			assert(queryCounter < m_queryLimit && "Submitted too many GPU queries! Consider increasing MaxQueries.");
 
-			const uint32_t id = (m_previousQueryCounter + m_queryCounter) % m_queryLimit;
-			m_queryCounter += 2;  // Allocate space for a begin and end query.
+			const uint32_t id = (m_previousQueryCounter + queryCounter) % m_queryLimit;
 
 			return id;
 		}
@@ -451,8 +449,6 @@ namespace tracy
 
 	static inline D3D12QueueCtx* CreateD3D12Context(ID3D12Device* device, ID3D12CommandQueue* queue)
 	{
-		InitRPMallocThread();
-
 		auto* ctx = static_cast<D3D12QueueCtx*>(tracy_malloc(sizeof(D3D12QueueCtx)));
 		new (ctx) D3D12QueueCtx{ device, queue };
 
