@@ -266,6 +266,16 @@ void TmxObjectGroup2D::StoreObject(const XMLElement& objectElem, const SharedPtr
 
         const Vector2 position(objectElem.GetFloat("x"), objectElem.GetFloat("y"));
         const Vector2 size(objectElem.GetFloat("width"), objectElem.GetFloat("height"));
+        float rotation = 0;
+
+        if (objectElem.HasAttribute("rotation"))
+        {
+            // tiled's rotation goes the opposite way urho's goes
+            rotation = objectElem.GetFloat("rotation") * -1;
+        }
+
+        
+        object->rotation_ = rotation;
 
         switch (object->objectType_)
         {

@@ -373,6 +373,8 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
     TmxFile2D* tmxFile = objectGroup->GetTmxFile();
     nodes_.Resize(objectGroup->GetNumObjects());
 
+    int mapHeight = tmxFile->GetInfo().height_;
+
     for (unsigned i = 0; i < objectGroup->GetNumObjects(); ++i)
     {
         const TileMapObject2D* object = objectGroup->GetObject(i);
@@ -380,6 +382,7 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
         // Create dummy node for all object
         SharedPtr<Node> objectNode(GetNode()->CreateTemporaryChild("Object"));
         objectNode->SetPosition(Vector3(object->GetPosition()));
+        objectNode->SetRotation2D(object->GetRotation());
 
         // If object is tile, create static sprite component
         if (object->GetObjectType() == OT_TILE && object->GetTileGid() && object->GetTileSprite())

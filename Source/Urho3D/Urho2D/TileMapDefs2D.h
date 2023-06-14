@@ -191,6 +191,10 @@ public:
     /// @property
     const Vector2& GetPosition() const { return position_; }
 
+    /// Return rotation.
+    /// @property
+    const float GetRotation() const { return rotation_; }
+
     /// Return size (for rectangle and ellipse).
     /// @property
     const Vector2& GetSize() const { return size_; }
@@ -233,6 +237,8 @@ private:
     String type_;
     /// Position.
     Vector2 position_;
+    /// Rotation.
+    float rotation_;
     /// Size (for rectangle and ellipse).
     Vector2 size_;
     /// Points(for polygon and polyline).

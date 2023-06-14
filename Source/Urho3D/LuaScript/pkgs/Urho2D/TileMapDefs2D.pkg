@@ -73,6 +73,7 @@ class TileMapObject2D
     const String GetName() const;
     const String GetType() const;
     const Vector2& GetPosition() const;
+	const float GetRotation() const;
     const Vector2& GetSize() const;
     unsigned GetNumPoints() const;
     const Vector2& GetPoint(unsigned index) const;
