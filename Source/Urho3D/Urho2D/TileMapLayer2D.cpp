@@ -391,7 +391,8 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
             staticSprite->SetSprite(object->GetTileSprite());
             staticSprite->SetFlip(object->GetTileFlipX(), object->GetTileFlipY(), object->GetTileSwapXY());
             staticSprite->SetLayer(drawOrder_);
-            staticSprite->SetOrderInLayer((int)((10.0f - object->GetPosition().y_) * 100));
+            
+            staticSprite->SetOrderInLayer((int)((mapHeight - object->GetPosition().y_) * 100));
 
             if (tmxFile->GetInfo().orientation_ == O_ISOMETRIC)
             {
