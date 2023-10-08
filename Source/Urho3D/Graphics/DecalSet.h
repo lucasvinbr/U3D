@@ -91,6 +91,7 @@ struct Decal
     float timer_;
     /// Maximum time to live in seconds (0 = infinite).
     float timeToLive_;
+    
     /// Local-space bounding box.
     BoundingBox boundingBox_;
     /// Decal vertices.
@@ -146,6 +147,8 @@ public:
     void RemoveDecals(unsigned num);
     /// Remove all decals.
     void RemoveAllDecals();
+    /// Multiply all decals' UV scale by the provided amount.
+    void MultiplyUVCoordScale(float scale);
 
     /// Return material.
     /// @property

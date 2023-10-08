@@ -510,6 +510,43 @@ void DecalSet::RemoveAllDecals()
     UpdateBatch();
 }
 
+void DecalSet::MultiplyUVCoordScale(float scaleMult)
+{
+    Vector2 UVCenter;
+
+    // prevent zero scale
+    if (scaleMult == 0.0f) {
+        scaleMult = M_EPSILON;
+    }
+
+    for (List<Decal>::Iterator decal = decals_.Begin(); decal != decals_.End();)
+    {
+        UVCenter = Vector2::ZERO;
+
+        RandomAccessIterator<DecalVertex> decalVert;
+
+        for (decalVert = decal->vertices_.Begin(); decalVert != decal->vertices_.End();)
+        {
+            UVCenter += decalVert->texCoord_;
+
+            ++decalVert;
+        }
+
+        UVCenter /= decal->vertices_.Size();
+
+        for (decalVert = decal->vertices_.Begin(); decalVert != decal->vertices_.End();)
+        {
+            decalVert->texCoord_ = UVCenter.Lerp(decalVert->texCoord_, scaleMult);
+
+            ++decalVert;
+        }
+
+        ++decal;
+    }
+
+    MarkDecalsDirty();
+}
+
 Material* DecalSet::GetMaterial() const
 {
     return batches_[0].material_;

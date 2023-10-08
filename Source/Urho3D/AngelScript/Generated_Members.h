@@ -4432,10 +4432,10 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
 // struct ShaderParameter | File: ../Graphics/ShaderVariation.h
 template <class T> void RegisterMembers_ShaderParameter(asIScriptEngine* engine, const char* className)
 {
-    // union ShaderParameter::@4 Urho3D::ShaderParameter::@5
-    // Error: type "union Urho3D::ShaderParameter::@4" can not automatically bind
-    // union ShaderParameter::@6 Urho3D::ShaderParameter::@7
-    // Error: type "union Urho3D::ShaderParameter::@6" can not automatically bind
+    // union ShaderParameter Urho3D::ShaderParameter
+    // Error: type "union Urho3D::ShaderParameter" can not automatically bind
+    // union ShaderParameter Urho3D::ShaderParameter
+    // Error: type "union Urho3D::ShaderParameter" can not automatically bind
     // ConstantBuffer* ShaderParameter::bufferPtr_
     // Not registered because pointer
 
@@ -8864,6 +8864,10 @@ template <class T> void RegisterMembers_TileMapObject2D(asIScriptEngine* engine,
     // const String& TileMapObject2D::GetProperty(const String& name) const
     engine->RegisterObjectMethod(className, "const String& GetProperty(const String&in) const", AS_METHODPR(T, GetProperty, (const String&) const, const String&), AS_CALL_THISCALL);
 
+    // const float TileMapObject2D::GetRotation() const
+    engine->RegisterObjectMethod(className, "const float GetRotation() const", AS_METHODPR(T, GetRotation, () const, const float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const float get_rotation() const", AS_METHODPR(T, GetRotation, () const, const float), AS_CALL_THISCALL);
+
     // const Vector2& TileMapObject2D::GetSize() const
     engine->RegisterObjectMethod(className, "const Vector2& GetSize() const", AS_METHODPR(T, GetSize, () const, const Vector2&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector2& get_size() const", AS_METHODPR(T, GetSize, () const, const Vector2&), AS_CALL_THISCALL);
@@ -10902,6 +10906,8 @@ template <class T> void RegisterMembers_Log(asIScriptEngine* engine, const char*
     // Not registered because have @nobind mark
     // static void Log::WriteFormat(int level, const char* format,...)
     // Error: type "const char*" can not automatically bind
+    // template <typename Arg0, typename... Args> static void Log::Write(int level, const char* format, Arg0&& arg0, Args&& ... args)
+    // Not registered because template
 
     // static void Log::WriteRaw(const String& message, bool error = false)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("void WriteRaw(const String&in, bool = false)", AS_FUNCTIONPR(T::WriteRaw, (const String&, bool), void), AS_CALL_CDECL);engine->SetDefaultNamespace("");
@@ -14534,6 +14540,9 @@ template <class T> void RegisterMembers_AnimationSet2D(asIScriptEngine* engine, 
 
     // bool AnimationSet2D::HasAnimation(const String& animationName) const
     engine->RegisterObjectMethod(className, "bool HasAnimation(const String&in) const", AS_METHODPR(T, HasAnimation, (const String&) const, bool), AS_CALL_THISCALL);
+
+    // bool AnimationSet2D::HasSpriteSheet() const
+    engine->RegisterObjectMethod(className, "bool HasSpriteSheet() const", AS_METHODPR(T, HasSpriteSheet, () const, bool), AS_CALL_THISCALL);
 
     // static void AnimationSet2D::RegisterObject(Context* context)
     // Not registered because have @nobind mark
@@ -21899,6 +21908,9 @@ template <class T> void RegisterMembers_DecalSet(asIScriptEngine* engine, const 
     // bool DecalSet::GetOptimizeBufferSize() const
     engine->RegisterObjectMethod(className, "bool GetOptimizeBufferSize() const", AS_METHODPR(T, GetOptimizeBufferSize, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_optimizeBufferSize() const", AS_METHODPR(T, GetOptimizeBufferSize, () const, bool), AS_CALL_THISCALL);
+
+    // void DecalSet::MultiplyUVCoordScale(float scale)
+    engine->RegisterObjectMethod(className, "void MultiplyUVCoordScale(float)", AS_METHODPR(T, MultiplyUVCoordScale, (float), void), AS_CALL_THISCALL);
 
     // void DecalSet::RemoveAllDecals()
     engine->RegisterObjectMethod(className, "void RemoveAllDecals()", AS_METHODPR(T, RemoveAllDecals, (), void), AS_CALL_THISCALL);

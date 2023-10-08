@@ -558,6 +558,9 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // Variant ToVectorVariant(const char* source) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
+    // String VFormatString(fmt::string_view format, fmt::format_args args) | File: ../Core/StringUtils.h
+    // Error: type "fmt::string_view" can not automatically bind
+
     // IntVector2 VectorAbs(const IntVector2& vec) | File: ../Math/Vector2.h
     engine->RegisterGlobalFunction("IntVector2 VectorAbs(const IntVector2&in)", AS_FUNCTIONPR(VectorAbs, (const IntVector2&), IntVector2), AS_CALL_CDECL);
 
