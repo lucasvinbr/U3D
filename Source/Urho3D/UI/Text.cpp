@@ -513,6 +513,18 @@ void Text::UpdateText(bool onResize)
         else
         {
             int maxWidth = GetWidth();
+
+            if (!IsFixedWidth())
+            {
+                // use parent layout to set our max width if possible
+                UIElement* parent = GetParent();
+                if (parent && parent->GetLayoutMode() != LM_FREE)
+                {
+                    auto& parentBorder = parent->GetLayoutBorder();
+                    maxWidth = parent->GetWidth() - (parentBorder.left_ + parentBorder.right_);
+                }
+            }
+            
             unsigned nextBreak = 0;
             unsigned lineStart = 0;
             printToText_.Clear();
@@ -648,13 +660,8 @@ void Text::UpdateText(bool onResize)
         // Set minimum and current size according to the text size, but respect fixed width if set
         if (!IsFixedWidth())
         {
-            if (wordWrap_)
-                SetMinWidth(0);
-            else
-            {
-                SetMinWidth(width);
-                SetWidth(width);
-            }
+            SetMinWidth(width);
+            SetWidth(width);
         }
         SetFixedHeight(height);
 
