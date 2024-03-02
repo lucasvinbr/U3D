@@ -660,8 +660,23 @@ void Text::UpdateText(bool onResize)
         // Set minimum and current size according to the text size, but respect fixed width if set
         if (!IsFixedWidth())
         {
-            SetMinWidth(width);
-            SetWidth(width);
+            if (wordWrap_) {
+                // don't set min width to 0 if we're inside a layout
+                UIElement* parent = GetParent();
+                if (parent && parent->GetLayoutMode() != LM_FREE)
+                {
+                    SetMinWidth(width);
+                    SetWidth(width);
+                }
+                else
+                {
+                    SetMinWidth(0);
+                }
+            }
+            else {
+                SetMinWidth(width);
+                SetWidth(width);
+            }
         }
         SetFixedHeight(height);
 
