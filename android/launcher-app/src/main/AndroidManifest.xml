@@ -11,6 +11,7 @@
         android:supportsRtl="true">
         <activity
             android:name=".LauncherActivity"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <intent-filter>

@@ -31,7 +31,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.0.2")
+        classpath("com.android.tools.build:gradle:4.2.2")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
 }
@@ -56,7 +56,7 @@ allprojects {
     buildscript {
         ext {
             set("kotlinVersion", kotlinVersion)
-            set("ndkSideBySideVersion", "21.3.6528147")
+            set("ndkSideBySideVersion", "26.1.10909125")
             set("cmakeVersion", "3.17.3+")
             set("buildStagingDir", ".cxx")
         }

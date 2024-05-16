@@ -38,10 +38,10 @@ val buildStagingDir: String by ext
 
 android {
     ndkVersion = ndkSideBySideVersion
-    compileSdkVersion(30)
+    compileSdkVersion(34)
     defaultConfig {
         minSdkVersion(18)
-        targetSdkVersion(30)
+        targetSdkVersion(33)
         versionCode = 1
         versionName = project.version.toString()
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
@@ -49,9 +49,11 @@ android {
             cmake {
                 arguments.apply {
                     System.getenv("ANDROID_CCACHE")?.let { add("-D ANDROID_CCACHE=$it") }
+					add("-D URHO3D_LIB_TYPE=SHARED")
                     // Pass along matching env-vars as CMake build options
                     addAll(project.file("../../script/.build-options")
                         .readLines()
+						.filterNot { listOf("URHO3D_LIB_TYPE").contains(it) }
                         .mapNotNull { variable -> System.getenv(variable)?.let { "-D $variable=$it" } }
                     )
                 }
@@ -80,7 +82,7 @@ android {
         cmake {
             version = cmakeVersion
             path = project.file("../../CMakeLists.txt")
-            setBuildStagingDirectory(buildStagingDir)
+            buildStagingDirectory = project.file(buildStagingDir)
         }
     }
     sourceSets {

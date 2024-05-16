@@ -33,10 +33,10 @@ val buildStagingDir: String by ext
 
 android {
     ndkVersion = ndkSideBySideVersion
-    compileSdkVersion(30)
+    compileSdkVersion(34)
     defaultConfig {
         minSdkVersion(18)
-        targetSdkVersion(30)
+        targetSdkVersion(33)
         applicationId = "io.urho3d.launcher"
         versionCode = 1
         versionName = project.version.toString()
@@ -46,13 +46,15 @@ android {
                 arguments.apply {
                     System.getenv("ANDROID_CCACHE")?.let { add("-D ANDROID_CCACHE=$it") }
                     add("-D BUILD_STAGING_DIR=${findProject(":android:urho3d-lib")!!.projectDir}/$buildStagingDir")
+					add("-D URHO3D_LIB_TYPE=SHARED")
                     add("-D URHO3D_PLAYER=1")
+					add("-D URHO3D_SAMPLES=1")
                     // Skip building samples for 'STATIC' lib type to reduce the spacetime requirement
-                    add("-D URHO3D_SAMPLES=${if (System.getenv("URHO3D_LIB_TYPE") == "SHARED") "1" else "0"}")
+//                    add("-D URHO3D_SAMPLES=${if (System.getenv("URHO3D_LIB_TYPE") == "SHARED") "1" else "0"}")
                     // Pass along matching env-vars as CMake build options
                     addAll(project.file("../../script/.build-options")
                         .readLines()
-                        .filterNot { listOf("URHO3D_PLAYER", "URHO3D_SAMPLES").contains(it) }
+                        .filterNot { listOf("URHO3D_PLAYER", "URHO3D_SAMPLES", "URHO3D_LIB_TYPE").contains(it) }
                         .mapNotNull { variable -> System.getenv(variable)?.let { "-D $variable=$it" } }
                     )
                 }
@@ -83,7 +85,7 @@ android {
         cmake {
             version = cmakeVersion
             path = project.file("CMakeLists.txt")
-            setBuildStagingDirectory(buildStagingDir)
+            buildStagingDirectory = project.file(buildStagingDir)
         }
     }
 }
