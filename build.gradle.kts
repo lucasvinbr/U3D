@@ -56,7 +56,7 @@ allprojects {
     buildscript {
         ext {
             set("kotlinVersion", kotlinVersion)
-            set("ndkSideBySideVersion", "26.1.10909125")
+            set("ndkSideBySideVersion", "21.3.6528147")
             set("cmakeVersion", "3.17.3+")
             set("buildStagingDir", ".cxx")
         }

@@ -42,8 +42,6 @@ android {
     defaultConfig {
         minSdkVersion(18)
         targetSdkVersion(33)
-        versionCode = 1
-        versionName = project.version.toString()
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
