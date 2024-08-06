@@ -48,6 +48,9 @@ android {
                 arguments.apply {
                     System.getenv("ANDROID_CCACHE")?.let { add("-D ANDROID_CCACHE=$it") }
 					add("-D URHO3D_LIB_TYPE=SHARED")
+					add("-D URHO3D_LUA=0")
+					add("-D URHO3D_LUAJIT=0")
+					add("-D URHO3D_SAMPLES=0")
                     // Pass along matching env-vars as CMake build options
                     addAll(project.file("../../script/.build-options")
                         .readLines()
