@@ -25,9 +25,7 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id("com.android.library")
-    id("com.jfrog.bintray")
     kotlin("android")
-    kotlin("android.extensions")
     `maven-publish`
 }
 
@@ -40,8 +38,8 @@ android {
     ndkVersion = ndkSideBySideVersion
     compileSdkVersion(34)
     defaultConfig {
-        minSdkVersion(18)
-        targetSdkVersion(33)
+        minSdkVersion(21)
+        targetSdkVersion(34)
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -96,8 +94,9 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
-    implementation("com.getkeepsafe.relinker:relinker:1.4.1")
-    testImplementation("junit:junit:4.13.1")
+    implementation("com.getkeepsafe.relinker:relinker:1.4.5")
+	implementation("androidx.core:core:1.13.1")
+	testImplementation("junit:junit:4.13.1")
     androidTestImplementation("androidx.test:runner:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }
@@ -172,31 +171,6 @@ publishing {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
             }
-        }
-    }
-}
-
-bintray {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_KEY")
-    publish = true
-    override = true
-    setPublications("UrhoRelease", "UrhoDebug")
-    pkg.apply {
-        repo = "maven"
-        name = project.name
-        setLicenses("MIT")
-        vcsUrl = "https://github.com/u3d-community/U3D.git"
-        userOrg = "urho3d"
-        setLabels("android", "game-development", "game-engine", "open-source", "urho3d")
-        websiteUrl = "https://urho3d.io/"
-        issueTrackerUrl = "https://github.com/u3d-community/U3D/issues"
-        githubRepo = "u3d-community/U3D"
-        publicDownloadNumbers = true
-        desc = project.description
-        version.apply {
-            name = project.version.toString()
-            desc = project.description
         }
     }
 }

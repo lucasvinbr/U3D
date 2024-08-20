@@ -24,7 +24,7 @@ import org.gradle.internal.io.NullOutputStream
 import java.io.ByteArrayOutputStream
 
 buildscript {
-    extra["kotlinVersion"] = "1.4.10"
+    extra["kotlinVersion"] = "1.8.10"
     val kotlinVersion: String by extra
     repositories {
         google()
@@ -34,10 +34,6 @@ buildscript {
         classpath("com.android.tools.build:gradle:4.2.2")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
-}
-
-plugins {
-    id("com.jfrog.bintray") version "1.8.5" apply false
 }
 
 val kotlinVersion: String by ext

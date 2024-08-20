@@ -23,6 +23,8 @@ import android.hardware.usb.*;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.core.content.ContextCompat;
+
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -202,7 +204,8 @@ public class HIDDeviceManager {
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         filter.addAction(HIDDeviceManager.ACTION_USB_PERMISSION);
-        mContext.registerReceiver(mUsbBroadcast, filter);
+        ContextCompat.registerReceiver(mContext, mUsbBroadcast, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+        //mContext.registerReceiver(mUsbBroadcast, filter);
 
         for (UsbDevice usbDevice : mUsbManager.getDeviceList().values()) {
             handleUsbDeviceAttached(usbDevice);

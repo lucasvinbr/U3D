@@ -23,7 +23,6 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    kotlin("android.extensions")
 }
 
 val kotlinVersion: String by ext
@@ -35,8 +34,8 @@ android {
     ndkVersion = ndkSideBySideVersion
     compileSdkVersion(34)
     defaultConfig {
-        minSdkVersion(18)
-        targetSdkVersion(33)
+        minSdkVersion(21)
+        targetSdkVersion(34)
         applicationId = "io.urho3d.launcher"
         versionCode = 1
         versionName = project.version.toString()
@@ -48,6 +47,8 @@ android {
                     add("-D BUILD_STAGING_DIR=${findProject(":android:urho3d-lib")!!.projectDir}/$buildStagingDir")
 					add("-D URHO3D_LIB_TYPE=SHARED")
                     add("-D URHO3D_PLAYER=1")
+					add("-D URHO3D_LUA=0")
+					add("-D URHO3D_LUAJIT=0")
 //					add("-D URHO3D_SAMPLES=1")
                     // Skip building samples for 'STATIC' lib type to reduce the spacetime requirement
                     add("-D URHO3D_SAMPLES=${if (System.getenv("URHO3D_LIB_TYPE") == "SHARED") "1" else "0"}")
@@ -73,7 +74,10 @@ android {
         }
     }
     buildTypes {
-        named("release") {
+        getByName("release") {
+			signingConfig = signingConfigs.getByName("debug")
+		}
+		named("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
