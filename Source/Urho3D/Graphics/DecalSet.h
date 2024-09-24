@@ -142,7 +142,7 @@ public:
     /// Add a decal at world coordinates, using a target drawable's geometry for reference. If the decal needs to move with the target, the decal component should be created to the target's node. Return true if successful.
     bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio,
         float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f,
-        unsigned subGeometry = M_MAX_UNSIGNED);
+        unsigned subGeometry = M_MAX_UNSIGNED, unsigned lodIndex = 0);
     /// Remove n oldest decals.
     void RemoveDecals(unsigned num);
     /// Remove all decals.
@@ -196,7 +196,7 @@ protected:
 private:
     /// Get triangle faces from the target geometry.
     void GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum,
-        const Vector3& decalNormal, float normalCutoff);
+        const Vector3& decalNormal, float normalCutoff, unsigned lodIndex = 0);
     /// Get triangle face from the target geometry.
     void GetFace
         (Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1, unsigned i2,

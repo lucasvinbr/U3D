@@ -300,7 +300,7 @@ void DecalSet::SetOptimizeBufferSize(bool enable)
 
 bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size,
     float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive, float normalCutoff,
-    unsigned subGeometry)
+    unsigned subGeometry, unsigned lodIndex)
 {
     URHO3D_PROFILE(AddDecal);
 
@@ -390,11 +390,11 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
 
     // Use either a specified subgeometry in the target, or all
     if (subGeometry < numBatches)
-        GetFaces(faces, target, subGeometry, decalFrustum, decalNormal, normalCutoff);
+        GetFaces(faces, target, subGeometry, decalFrustum, decalNormal, normalCutoff, lodIndex);
     else
     {
         for (unsigned i = 0; i < numBatches; ++i)
-            GetFaces(faces, target, i, decalFrustum, decalNormal, normalCutoff);
+            GetFaces(faces, target, i, decalFrustum, decalNormal, normalCutoff, lodIndex);
     }
 
     // Clip the acquired faces against all frustum planes
@@ -732,10 +732,10 @@ void DecalSet::OnWorldBoundingBoxUpdate()
 }
 
 void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum,
-    const Vector3& decalNormal, float normalCutoff)
+    const Vector3& decalNormal, float normalCutoff, unsigned lodIndex)
 {
-    // Try to use the most accurate LOD level if possible
-    Geometry* geometry = target->GetLodGeometry(batchIndex, 0);
+    // Try to use the most accurate LOD level by default
+    Geometry* geometry = target->GetLodGeometry(batchIndex, lodIndex);
     if (!geometry || geometry->GetPrimitiveType() != TRIANGLE_LIST)
         return;
 
