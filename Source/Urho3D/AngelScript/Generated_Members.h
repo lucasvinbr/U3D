@@ -21875,8 +21875,8 @@ template <class T> void RegisterMembers_DecalSet(asIScriptEngine* engine, const 
     // void DecalSet::SetDecalsAttr(const PODVector<unsigned char>& value)
     // Error: type "const PODVector<unsigned char>&" can not automatically bind
 
-    // bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, unsigned subGeometry = M_MAX_UNSIGNED)
-    engine->RegisterObjectMethod(className, "bool AddDecal(Drawable@+, const Vector3&in, const Quaternion&in, float, float, float, const Vector2&in, const Vector2&in, float = 0.0f, float = 0.1f, uint = M_MAX_UNSIGNED)", AS_METHODPR(T, AddDecal, (Drawable*, const Vector3&, const Quaternion&, float, float, float, const Vector2&, const Vector2&, float, float, unsigned), bool), AS_CALL_THISCALL);
+    // bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, unsigned subGeometry = M_MAX_UNSIGNED, unsigned lodIndex = 0)
+    engine->RegisterObjectMethod(className, "bool AddDecal(Drawable@+, const Vector3&in, const Quaternion&in, float, float, float, const Vector2&in, const Vector2&in, float = 0.0f, float = 0.1f, uint = M_MAX_UNSIGNED, uint = 0)", AS_METHODPR(T, AddDecal, (Drawable*, const Vector3&, const Quaternion&, float, float, float, const Vector2&, const Vector2&, float, float, unsigned, unsigned), bool), AS_CALL_THISCALL);
 
     // Material* DecalSet::GetMaterial() const
     engine->RegisterObjectMethod(className, "Material@+ GetMaterial() const", AS_METHODPR(T, GetMaterial, () const, Material*), AS_CALL_THISCALL);
