@@ -1,5 +1,6 @@
 //
 // Copyright (c) 2008-2022 the Urho3D project.
+// Copyright (c) 2022-2024 the U3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +26,7 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id("com.android.library")
-    kotlin("android")
+    id("org.jetbrains.kotlin.android")
     `maven-publish`
 }
 
@@ -36,23 +37,18 @@ val buildStagingDir: String by ext
 
 android {
     ndkVersion = ndkSideBySideVersion
-    compileSdkVersion(34)
+    compileSdkVersion(30)
     defaultConfig {
-        minSdkVersion(21)
-        targetSdkVersion(34)
+        minSdkVersion(19)
+        targetSdkVersion(30)
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
                 arguments.apply {
                     System.getenv("ANDROID_CCACHE")?.let { add("-D ANDROID_CCACHE=$it") }
-					add("-D URHO3D_LIB_TYPE=SHARED")
-					add("-D URHO3D_LUA=0")
-					add("-D URHO3D_LUAJIT=0")
-					add("-D URHO3D_SAMPLES=0")
                     // Pass along matching env-vars as CMake build options
                     addAll(project.file("../../script/.build-options")
                         .readLines()
-						.filterNot { listOf("URHO3D_LIB_TYPE").contains(it) }
                         .mapNotNull { variable -> System.getenv(variable)?.let { "-D $variable=$it" } }
                     )
                 }
@@ -81,7 +77,7 @@ android {
         cmake {
             version = cmakeVersion
             path = project.file("../../CMakeLists.txt")
-            buildStagingDirectory = project.file(buildStagingDir)
+            buildStagingDirectory("$buildStagingDir/${LibType()}")
         }
     }
     sourceSets {
@@ -89,14 +85,16 @@ android {
             java.srcDir("../../Source/ThirdParty/SDL/android-project/app/src/main/java")
         }
     }
+    lintOptions {
+        isAbortOnError = true
+    }
 }
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
-    implementation("com.getkeepsafe.relinker:relinker:1.4.5")
-	implementation("androidx.core:core:1.13.1")
-	testImplementation("junit:junit:4.13.1")
+    implementation("com.getkeepsafe.relinker:relinker:1.4.2")
+    testImplementation("junit:junit:4.13.1")
     androidTestImplementation("androidx.test:runner:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }
@@ -175,10 +173,13 @@ publishing {
     }
 }
 
+fun LibType(): String {
+    return System.getenv("URHO3D_LIB_TYPE")?.toLowerCase() ?: "static"
+}
+
 fun MavenPublication.configure(config: String) {
-    val libType = System.getenv("URHO3D_LIB_TYPE")?.toLowerCase() ?: "static"
     groupId = project.group.toString()
-    artifactId = "${project.name}-$libType${if (config == "debug") "-debug" else ""}"
+    artifactId = "${project.name}-${LibType()}${if (config == "debug") "-debug" else "" }"
     afterEvaluate {
         from(components[config])
     }

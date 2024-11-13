@@ -72,27 +72,15 @@ URHO3D_EVENT(E_ATTRIBUTEANIMATIONUPDATE, AttributeAnimationUpdate)
     URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
-/// Attribute animation added directly to animatable.
+/// Attribute animation added to object animation, or directly to the animatable.
 URHO3D_EVENT(E_ATTRIBUTEANIMATIONADDED, AttributeAnimationAdded)
-{
-    URHO3D_PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
-}
-
-/// Attribute animation that was added directly to animatable was removed.
-URHO3D_EVENT(E_ATTRIBUTEANIMATIONREMOVED, AttributeAnimationRemoved)
-{
-    URHO3D_PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
-}
-
-/// Attribute animation added to object animation.
-URHO3D_EVENT(E_OBJECTATTRIBUTEANIMATIONADDED, ObjectAttributeAnimationAdded)
 {
     URHO3D_PARAM(P_OBJECTANIMATION, ObjectAnimation);               // Object animation pointer
     URHO3D_PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
 }
 
-/// Attribute animation removed from object animation.
-URHO3D_EVENT(E_OBJECTATTRIBUTEANIMATIONREMOVED, ObjectAttributeAnimationRemoved)
+/// Attribute animation removed from object animation, or directly from the animatable.
+URHO3D_EVENT(E_ATTRIBUTEANIMATIONREMOVED, AttributeAnimationRemoved)
 {
     URHO3D_PARAM(P_OBJECTANIMATION, ObjectAnimation);               // Object animation pointer
     URHO3D_PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String

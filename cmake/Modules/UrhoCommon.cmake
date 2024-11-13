@@ -1,5 +1,6 @@
 #
 # Copyright (c) 2008-2022 the Urho3D project.
+# Copyright (c) 2022-2024 the U3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -52,6 +53,7 @@ elseif (CMAKE_GENERATOR MATCHES Visual)
 endif ()
 
 # Rightfully we could have performed this inside a CMake/iOS toolchain file but we don't have one nor need for one for now
+if (APPLE)
 if (IOS)
     set (CMAKE_CROSSCOMPILING TRUE)
     set (CMAKE_XCODE_EFFECTIVE_PLATFORMS -iphoneos -iphonesimulator)
@@ -121,9 +123,23 @@ elseif (XCODE)
     endif ()
     set (DEPLOYMENT_TARGET_SAVED ${CMAKE_OSX_DEPLOYMENT_TARGET} CACHE INTERNAL "Last known deployment target")
 endif ()
+endif ()
 
 include (CheckHost)
 include (CheckCompilerToolchain)
+
+# Force Macos x86_64
+if (APPLE AND NOT IOS AND NOT TVOS)
+    set (CMAKE_OSX_ARCHITECTURES x86_64)
+    if (ARM)
+        set (ARM 0)
+        unset (ARM CACHE)
+        set (NEON 0)
+        unset (NEON CACHE)
+        set (HAVE_NEON 0)
+        message ("-- Force Apple Architecture x86_64 - inactive ARM and NEON !")
+    endif ()
+endif ()
 
 # Extra linker flags for linking against indirect dependencies (linking shared lib with dependencies)
 if (RPI AND NOT RPI_ABI STREQUAL RPI4)
@@ -507,6 +523,9 @@ if (WIN32 AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
         link_directories (${DIRECTX_LIBRARY_DIRS})
     endif ()
 endif ()
+
+# SDL_LIBS : allow to link against Urho3D the external LIBS from SDL
+set (SDL_LIBS)
 
 # Platform and compiler specific options
 set (CMAKE_CXX_STANDARD 11)
@@ -894,16 +913,20 @@ macro (define_dependency_libs TARGET)
             list (APPEND LIBS dl log android)
         else ()
             # Linux
-            if (${TARGET} MATCHES SDL)
-                # set external libraries dependencies for SDL and add them later to URHO3D
-                set (URHO3D_LIBRARIES ${EXTRA_LIBS} PARENT_SCOPE)
-            elseif (NOT WEB)                
+            if (NOT WEB)
                 list (APPEND LIBS dl m rt)
             endif ()
             if (RPI)
                 list (APPEND ABSOLUTE_PATH_LIBS ${VIDEOCORE_LIBRARIES})
             endif ()
         endif ()
+    endif ()
+
+    # Set extra dependencies from SDL and add them later to URHO3D
+    # Android : need OpenSLES
+    # Linux   : may need Wayland and X11 (only for X11-static)
+    if (${TARGET} MATCHES SDL)
+       set (SDL_LIBS ${EXTRA_LIBS} PARENT_SCOPE)
     endif ()
 
     # ThirdParty/Civetweb external dependency
@@ -954,14 +977,22 @@ macro (define_dependency_libs TARGET)
                 list (APPEND LIBS dbghelp)
             endif ()
         elseif (APPLE)
+            # use find_library to retrieve compatible frameworks for ios/tvos (compatible with cmake 3.28+)
             if (ARM)
-                list (APPEND LIBS "-framework AudioToolbox" "-framework AVFoundation" "-framework CoreAudio" "-framework CoreBluetooth" "-framework CoreGraphics" "-framework Foundation" "-framework GameController" "-framework OpenGLES" "-framework QuartzCore" "-framework UIKit")
+                set (FRAMEWORKS AudioToolbox AVFoundation CoreAudio CoreBluetooth CoreGraphics Foundation GameController OpenGLES QuartzCore UIKit)
                 if (NOT TVOS)
-                    list (APPEND LIBS "-framework CoreMotion")
+                    set (FRAMEWORKS ${FRAMEWORKS} CoreMotion)
                 endif ()
             else ()
-                list (APPEND LIBS "-framework AudioToolbox" "-framework Carbon" "-framework Cocoa" "-framework CoreFoundation" "-framework SystemConfiguration" "-framework CoreAudio" "-framework CoreBluetooth" "-framework CoreServices" "-framework CoreVideo" "-framework ForceFeedback" "-framework IOKit" "-framework OpenGL")
+                set (FRAMEWORKS AudioToolbox Carbon Cocoa CoreFoundation SystemConfiguration CoreAudio CoreBluetooth CoreServices CoreVideo ForceFeedback IOKit OpenGL) 
             endif ()
+            foreach (FRAMEWORK ${FRAMEWORKS})
+                find_library(LIB ${FRAMEWORK} NO_CACHE)
+                if (LIB)
+                    list (APPEND LIBS ${LIB})
+                endif ()
+                unset (LIB)
+            endforeach ()
         endif ()
 
         # Graphics
@@ -1779,7 +1810,9 @@ macro (_setup_target)
     include_directories (${INCLUDE_DIRS})
     # Link libraries
     define_dependency_libs (${TARGET_NAME})
-    target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${LIBS})
+    # Needed external libraries for the current target (SDL_LIBS added)
+    target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${SDL_LIBS} ${LIBS})
+    set (SDL_LIBS)
     # Enable PCH if requested
     if (${TARGET_NAME}_HEADER_PATHNAME)
         enable_pch (${${TARGET_NAME}_HEADER_PATHNAME})
