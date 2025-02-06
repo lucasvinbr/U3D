@@ -303,8 +303,8 @@ void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation)
     if (objectAnimation_)
     {
         OnObjectAnimationRemoved(objectAnimation_);
-        UnsubscribeFromEvent(objectAnimation_, E_OBJECTATTRIBUTEANIMATIONADDED);
-        UnsubscribeFromEvent(objectAnimation_, E_OBJECTATTRIBUTEANIMATIONREMOVED);
+        UnsubscribeFromEvent(objectAnimation_, E_ATTRIBUTEANIMATIONADDED);
+        UnsubscribeFromEvent(objectAnimation_, E_ATTRIBUTEANIMATIONREMOVED);
     }
 
     objectAnimation_ = objectAnimation;
@@ -312,8 +312,8 @@ void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation)
     if (objectAnimation_)
     {
         OnObjectAnimationAdded(objectAnimation_);
-        SubscribeToEvent(objectAnimation_, E_OBJECTATTRIBUTEANIMATIONADDED, URHO3D_HANDLER(Animatable, HandleObjectAttributeAnimationAdded));
-        SubscribeToEvent(objectAnimation_, E_OBJECTATTRIBUTEANIMATIONREMOVED, URHO3D_HANDLER(Animatable, HandleObjectAttributeAnimationRemoved));
+        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONADDED, URHO3D_HANDLER(Animatable, HandleAttributeAnimationAdded));
+        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONREMOVED, URHO3D_HANDLER(Animatable, HandleAttributeAnimationRemoved));
     }
 }
 
@@ -556,12 +556,12 @@ AttributeAnimationInfo* Animatable::GetAttributeAnimationInfo(const String& name
     return nullptr;
 }
 
-void Animatable::HandleObjectAttributeAnimationAdded(StringHash eventType, VariantMap& eventData)
+void Animatable::HandleAttributeAnimationAdded(StringHash eventType, VariantMap& eventData)
 {
     if (!objectAnimation_)
         return;
 
-    using namespace ObjectAttributeAnimationAdded;
+    using namespace AttributeAnimationAdded;
     const String& name = eventData[P_ATTRIBUTEANIMATIONNAME].GetString();
 
     ValueAnimationInfo* info = objectAnimation_->GetAttributeAnimationInfo(name);
@@ -571,12 +571,12 @@ void Animatable::HandleObjectAttributeAnimationAdded(StringHash eventType, Varia
     SetObjectAttributeAnimation(name, info->GetAnimation(), info->GetWrapMode(), info->GetSpeed());
 }
 
-void Animatable::HandleObjectAttributeAnimationRemoved(StringHash eventType, VariantMap& eventData)
+void Animatable::HandleAttributeAnimationRemoved(StringHash eventType, VariantMap& eventData)
 {
     if (!objectAnimation_)
         return;
 
-    using namespace ObjectAttributeAnimationRemoved;
+    using namespace AttributeAnimationRemoved;
     const String& name = eventData[P_ATTRIBUTEANIMATIONNAME].GetString();
 
     SetObjectAttributeAnimation(name, nullptr, WM_LOOP, 1.0f);
