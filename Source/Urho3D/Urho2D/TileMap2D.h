@@ -45,9 +45,6 @@ public:
     /// @nobind
     static void RegisterObject(Context* context);
 
-    /// Handle node being assigned.
-    void OnNodeSet(Node* node) override;
-
     /// Visualize the component as debug geometry.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 

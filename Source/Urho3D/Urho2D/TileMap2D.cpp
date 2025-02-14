@@ -56,13 +56,6 @@ void TileMap2D::RegisterObject(Context* context)
         AM_DEFAULT);
 }
 
-void TileMap2D::OnNodeSet(Node* node)
-{
-    Scene* scene = GetScene();
-    if (scene)
-        SubscribeToEvent(scene, E_SCENEUPDATE , URHO3D_HANDLER(TileMap2D, HandleSceneUpdate));
-}
-
 // Transform vector from node-local space to global space
 static Vector2 TransformNode2D(const Matrix3x4& transform, Vector2 local)
 {
@@ -131,6 +124,8 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
 
     layers_.Clear();
 
+    UnsubscribeFromEvent(E_SCENEUPDATE);
+
     tmxFile_ = tmxFile;
     if (!tmxFile_)
         return;
@@ -157,6 +152,11 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
 
         layers_[i] = layer;
     }
+
+    // subscribe to updates for tile animations
+    Scene* scene = GetScene();
+    if (scene)
+        SubscribeToEvent(scene, E_SCENEUPDATE, URHO3D_HANDLER(TileMap2D, HandleSceneUpdate));
 }
 
 TmxFile2D* TileMap2D::GetTmxFile() const
