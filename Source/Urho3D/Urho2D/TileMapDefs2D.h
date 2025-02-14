@@ -220,7 +220,7 @@ public:
     /// @property
     const String& GetName() const { return name_; }
 
-    /// Return type.
+    /// Return type. Displayed as the "Class" field in Tiled's UI.
     /// @property
     const String& GetType() const { return type_; }
 
@@ -270,7 +270,7 @@ private:
     TileMapObjectType2D objectType_{};
     /// Name.
     String name_;
-    /// Type.
+    /// Type. Displayed as "Class" in the Tiled UI.
     String type_;
     /// Position.
     Vector2 position_;
