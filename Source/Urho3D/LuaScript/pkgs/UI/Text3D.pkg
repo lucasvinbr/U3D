@@ -31,6 +31,7 @@ class Text3D : public Drawable
     void SetTextAlignment(HorizontalAlignment align);
     void SetRowSpacing(float spacing);
     void SetWordwrap(bool enable);
+    void SetAutoLocalizable(bool enable);
     void SetTextEffect(TextEffect textEffect);
     void SetEffectShadowOffset(const IntVector2& offset);
     void SetEffectStrokeThickness(int thickness);
@@ -53,6 +54,7 @@ class Text3D : public Drawable
     VerticalAlignment GetVerticalAlignment() const;
     float GetRowSpacing() const;
     bool GetWordwrap() const;
+    bool GetAutoLocalizable() const;
     TextEffect GetTextEffect() const;
     const IntVector2& GetEffectShadowOffset() const;
     int GetEffectStrokeThickness() const;

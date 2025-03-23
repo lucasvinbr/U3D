@@ -418,6 +418,9 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
 #endif
 
 #ifdef URHO3D_URHO2D
+    // FrameSet2D::FrameSet2D() | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectBehaviour("FrameSet2D", asBEHAVE_FACTORY, "FrameSet2D@+ f()", asFUNCTION(ASCompatibleFactory<FrameSet2D>), AS_CALL_CDECL);
+
     // PropertySet2D::PropertySet2D() | File: ../Urho2D/TileMapDefs2D.h
     engine->RegisterObjectBehaviour("PropertySet2D", asBEHAVE_FACTORY, "PropertySet2D@+ f()", asFUNCTION(ASCompatibleFactory<PropertySet2D>), AS_CALL_CDECL);
 

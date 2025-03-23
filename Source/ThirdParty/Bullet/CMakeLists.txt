@@ -43,5 +43,10 @@ set (INCLUDE_DIRS src)
 # Setup target
 setup_library ()
 
+if (MSVC)
+    # Silence MSVC 'conversion' warnings for the target 'Bullet'
+    target_compile_options(Bullet PRIVATE "/wd4244" "/wd4267")
+endif()
+
 # Install headers for building and using the Urho3D library (install dependency for Urho3D/Physics/PhysicsWorld.h, Urho3D/Physics/RigidBody.h, and Urho3D/Physics/PhysicsUtils.h)
 install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Bullet FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant

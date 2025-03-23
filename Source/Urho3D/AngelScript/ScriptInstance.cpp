@@ -752,7 +752,7 @@ void ScriptInstance::GetScriptAttributes()
             {
                 info.mode_ |= AM_FILE;
                 info.name_ = name;
-                info.ptr_ = (void*)i;
+                info.ptr_ = (void*)(asPWORD)i;
                 attrTemplate->Push(info);
             }
         }
@@ -763,7 +763,7 @@ void ScriptInstance::GetScriptAttributes()
     {
         attributeInfos_.Push(attrTemplate->At(i));
         AttributeInfo& back = attributeInfos_.Back();
-        back.ptr_ = scriptObject_->GetAddressOfProperty((size_t)back.ptr_);
+        back.ptr_ = scriptObject_->GetAddressOfProperty((asPWORD)back.ptr_);
         int t = 1;
     }
 }

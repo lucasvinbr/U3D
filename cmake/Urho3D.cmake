@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022-2024 the U3D project.
+# Copyright (c) 2022-2025 the U3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,6 @@
 # TODO: Patcher to finish
 # TODO: finish the tag list generation in discover module
 # TODO: allow select crosscompiled build
-# TODO: remove android quick fix
 
 string (TOUPPER ${CMAKE_PROJECT_NAME} PROJECTNAME)
 
@@ -72,7 +71,6 @@ function (urho_find_origin dir root source origin)
                 break ()
             endif ()            
         endif ()
-        message ("urho_find_origin : path = ${currentpath}")
         set (previouspath ${currentpath})
         get_filename_component (currentpath ${previouspath} DIRECTORY)
     endwhile ()
@@ -103,13 +101,23 @@ endmacro ()
 
 if (EXISTS ${CMAKE_SOURCE_DIR}/cmake)
     set (PROJECT_CMAKE_DIR ${CMAKE_SOURCE_DIR}/cmake)
-else()
-    message ("Cannot find the cmake directory!")
+else ()
+    message ("!!! Cannot find the cmake directory !")
+    return ()
+endif ()
+
+# for Android build, if URHO3D_HOME is not explicitly set,
+# Let FindUrho3D.cmake find the urho3d lib.
+if (ANDROID AND NOT DEFINED(URHO3D_HOME) AND (BUILD_STAGING_DIR OR JNI_DIR))
+    if (NOT URHOCOMMON_INUSE)
+        include (${CMAKE_SOURCE_DIR}/cmake/Modules/UrhoCommon.cmake)
+    endif ()
     return ()
 endif ()
 
 # Check URHO3D_HOME
 if (URHO3D_HOME AND NOT EXISTS ${URHO3D_HOME})
+    message ("!! ${URHO3D_HOME} don't exist ... reset URHO3D_HOME !")
     unset (URHO3D_HOME)
 endif ()
 
@@ -137,11 +145,11 @@ endif ()
 
 # Stop here if URHO3D_HOME is empty or undefined.
 # URHO3D_HOME should be set manually.
-if (NOT URHO3D_HOME AND NOT ANDROID) # TODO : android quick fix
+if (NOT URHO3D_HOME)
     if (${PROJECTNAME}_URHO3D_DIRS)
-        message ("URHO3D_DISCOVER has found some Urho3D folders. Please select one with cmake-gui.")
+        message ("-- URHO3D_DISCOVER has found some Urho3D folders. Please select one with cmake-gui.")
     else ()
-        message ("URHO3D_HOME is undefined!")
+        message ("!! URHO3D_HOME is undefined !")
     endif ()
     return ()
 endif ()
@@ -158,10 +166,10 @@ set (URHO3D_AS_SUBMODULE FALSE CACHE INTERNAL BOOLEAN)
 # Example: Retrieve URHO3D_ROOT_DIR="/path/to/urho3d/urho3d-1.x/" from URHO3D_HOME="/path/to/urho3d/urho3d-1.x/build/linux/static/release".
 unset (origin)
 
-if (NOT ANDROID) # TODO : android quick fix
+if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     urho_find_origin ("${URHO3D_HOME}" URHO3D_ROOT_DIR URHO3D_SOURCE_DIR origin)
     if (NOT origin)
-        message (FATAL_ERROR "The Urho3D path appears to be invalid!")
+        message (FATAL_ERROR "!!! The Urho3D path appears to be invalid !")
     endif ()
 endif ()
 

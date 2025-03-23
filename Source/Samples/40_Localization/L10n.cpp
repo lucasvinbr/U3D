@@ -74,10 +74,11 @@ void L10n::InitLocalizationSystem()
     auto* l10n = GetSubsystem<Localization>();
     // JSON files must be in UTF8 encoding without BOM
     // The first found language will be set as current
-    l10n->LoadJSONFile("StringsEnRu.json");
+    l10n->LoadJSONFile("Translation/StringsEnRu.json");
     // You can load multiple files
-    l10n->LoadJSONFile("StringsDe.json");
-    l10n->LoadJSONFile("StringsLv.json", "lv");
+    l10n->LoadJSONFile("Translation/StringsDe.json");
+    l10n->LoadJSONFile("Translation/StringsLv.json", "lv");
+    l10n->LoadJSONFile("Translation/StringsFr.json", "fr");
     // Hook up to the change language
     SubscribeToEvent(E_CHANGELANGUAGE, URHO3D_HANDLER(L10n, HandleChangeLanguage));
 }
@@ -180,9 +181,9 @@ void L10n::CreateScene()
     text3DNode->SetPosition(Vector3(0.0f, 0.1f, 30.0f));
     auto* text3D = text3DNode->CreateComponent<Text3D>();
 
-    // Manually set text in the current language.
-    text3D->SetText(l10n->Get("lang"));
-
+    // Set autolocalizable Text3D with the language as text.
+    text3D->SetText("lang");
+    text3D->SetAutoLocalizable(true);
     text3D->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 30);
     text3D->SetColor(Color::BLACK);
     text3D->SetAlignment(HA_CENTER, VA_BOTTOM);
@@ -237,8 +238,5 @@ void L10n::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
     auto* buttonText = uiRoot->GetChildStaticCast<Text>("ButtonTextQuit", true);
     buttonText->SetText(l10n->Get("quit"));
 
-    auto* text3D = scene_->GetChild("Text3D")->GetComponent<Text3D>();
-    text3D->SetText(l10n->Get("lang"));
-
-    // A text on the button "Press this button" changes automatically
+    // the button text "Press this button" and the Text3D change automatically.
 }

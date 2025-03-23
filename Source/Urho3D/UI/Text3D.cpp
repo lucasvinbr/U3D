@@ -1,5 +1,6 @@
 //
 // Copyright (c) 2008-2022 the Urho3D project.
+// Copyright (c) 2022-2025 the U3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +32,7 @@
 #include "../Graphics/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
+#include "../Resource/ResourceEvents.h"
 #include "../Scene/Node.h"
 #include "../UI/Font.h"
 #include "../UI/Text.h"
@@ -78,6 +80,7 @@ void Text3D::RegisterObject(Context* context)
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String, String::EMPTY, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Row Spacing", float, text_.rowSpacing_, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Auto Localizable", GetAutoLocalizable, SetAutoLocalizable, bool, false, AM_FILE);
     URHO3D_ATTRIBUTE("Word Wrap", bool, text_.wordWrap_, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Fixed Screen Size", IsFixedScreenSize, SetFixedScreenSize, bool, false, AM_DEFAULT);
@@ -270,6 +273,19 @@ void Text3D::SetWordwrap(bool enable)
     text_.SetWordwrap(enable);
 
     MarkTextDirty();
+}
+
+void Text3D::SetAutoLocalizable(bool enable)
+{
+    text_.SetAutoLocalizable(enable);
+    text_.UnsubscribeFromEvent(E_CHANGELANGUAGE);
+
+    if (enable)
+        SubscribeToEvent(E_CHANGELANGUAGE, URHO3D_HANDLER(Text3D, HandleChangeLanguage));
+    else
+        UnsubscribeFromEvent(E_CHANGELANGUAGE);
+
+    ApplyAttributes();        
 }
 
 void Text3D::SetTextEffect(TextEffect textEffect)
@@ -761,6 +777,11 @@ void Text3D::CalculateFixedScreenSize(const FrameInfo& frame)
     customWorldTransform_ = Matrix3x4(worldPosition, frame.camera_->GetFaceCameraRotation(
         worldPosition, node_->GetWorldRotation(), faceCameraMode_, minAngle_), worldScale);
     worldBoundingBoxDirty_ = true;
+}
+
+void Text3D::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
+{
+    ApplyAttributes();
 }
 
 }

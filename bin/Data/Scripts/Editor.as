@@ -33,7 +33,7 @@ void Start()
 {
     // Assign the value ASAP because configFileName is needed on exit, including exit on error
     configFileName = fileSystem.GetAppPreferencesDir("urho3d", "Editor") + "Config.xml";
-    localization.LoadJSONFile("EditorStrings.json");
+    localization.LoadJSONFile("Translation/EditorStrings.json");
 
     if (engine.headless)
     {

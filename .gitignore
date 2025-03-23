@@ -12,7 +12,7 @@
 /lib*/
 generated/
 /Source/Urho3D/tolua++-prefix/
-build/
+build*/
 /captures/
 .cxx/
 /demo/

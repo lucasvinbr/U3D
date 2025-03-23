@@ -584,11 +584,17 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
 #endif
 
 #ifdef URHO3D_URHO2D
+    // class FrameSet2D | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectType("FrameSet2D", 0, asOBJ_REF);
+
     // class PropertySet2D | File: ../Urho2D/TileMapDefs2D.h
     engine->RegisterObjectType("PropertySet2D", 0, asOBJ_REF);
 
     // class Tile2D | File: ../Urho2D/TileMapDefs2D.h
     engine->RegisterObjectType("Tile2D", 0, asOBJ_REF);
+
+    // struct TileFrameInfo2D | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectType("TileFrameInfo2D", 0, asOBJ_REF);
 
     // class TileMapObject2D | File: ../Urho2D/TileMapDefs2D.h
     engine->RegisterObjectType("TileMapObject2D", 0, asOBJ_REF);

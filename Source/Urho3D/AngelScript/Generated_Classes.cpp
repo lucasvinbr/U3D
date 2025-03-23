@@ -3937,6 +3937,18 @@ static void Register_CollisionGeometryData(asIScriptEngine* engine)
 
 #ifdef URHO3D_URHO2D
 
+// class FrameSet2D | File: ../Urho2D/TileMapDefs2D.h
+static void Register_FrameSet2D(asIScriptEngine* engine)
+{
+    RegisterSubclass<RefCounted, FrameSet2D>(engine, "RefCounted", "FrameSet2D");
+
+    RegisterMembers_FrameSet2D<FrameSet2D>(engine, "FrameSet2D");
+
+    #ifdef REGISTER_CLASS_MANUAL_PART_FrameSet2D
+        REGISTER_CLASS_MANUAL_PART_FrameSet2D();
+    #endif
+}
+
 // class PropertySet2D | File: ../Urho2D/TileMapDefs2D.h
 static void Register_PropertySet2D(asIScriptEngine* engine)
 {
@@ -3958,6 +3970,18 @@ static void Register_Tile2D(asIScriptEngine* engine)
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Tile2D
         REGISTER_CLASS_MANUAL_PART_Tile2D();
+    #endif
+}
+
+// struct TileFrameInfo2D | File: ../Urho2D/TileMapDefs2D.h
+static void Register_TileFrameInfo2D(asIScriptEngine* engine)
+{
+    RegisterSubclass<RefCounted, TileFrameInfo2D>(engine, "RefCounted", "TileFrameInfo2D");
+
+    RegisterMembers_TileFrameInfo2D<TileFrameInfo2D>(engine, "TileFrameInfo2D");
+
+    #ifdef REGISTER_CLASS_MANUAL_PART_TileFrameInfo2D
+        REGISTER_CLASS_MANUAL_PART_TileFrameInfo2D();
     #endif
 }
 
@@ -8548,8 +8572,10 @@ void ASRegisterGeneratedClasses(asIScriptEngine* engine)
 #endif
 
 #ifdef URHO3D_URHO2D
+    Register_FrameSet2D(engine);
     Register_PropertySet2D(engine);
     Register_Tile2D(engine);
+    Register_TileFrameInfo2D(engine);
     Register_TileMapObject2D(engine);
     Register_TmxLayer2D(engine);
 #endif

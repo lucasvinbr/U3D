@@ -30,10 +30,11 @@ end
 function InitLocalizationSystem()
     -- JSON files must be in UTF8 encoding without BOM
     -- The first found language will be set as current
-    localization:LoadJSONFile("StringsEnRu.json")
+    localization:LoadJSONFile("Translation/StringsEnRu.json")
     -- You can load multiple files
-    localization:LoadJSONFile("StringsDe.json")
-    localization:LoadJSONFile("StringsLv.json", "lv")
+    localization:LoadJSONFile("Translation/StringsDe.json")
+    localization:LoadJSONFile("Translation/StringsLv.json", "lv")
+    localization:LoadJSONFile("Translation/StringsFr.json", "fr")
     -- Hook up to the change language
     SubscribeToEvent("ChangeLanguage", "HandleChangeLanguage")
 end
@@ -126,9 +127,9 @@ function CreateScene()
     text3DNode:SetScale(15)
     local text3D = text3DNode:CreateComponent("Text3D")
 
-    -- Manually set text in the current language.
-    text3D.text = localization:Get("lang")
-
+    -- Set autolocalizable Text3D with the language as text.
+    text3D.text = "lang"
+    text3D:SetAutoLocalizable(true)
     text3D:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 30)
     text3D.color = Color.BLACK
     text3D:SetAlignment(HA_CENTER, VA_BOTTOM)
@@ -173,8 +174,5 @@ function HandleChangeLanguage(eventType, eventData)
     local buttonText = ui.root:GetChild("ButtonTextQuit", true)
     buttonText.text = localization:Get("quit")
 
-    local text3D = scene_:GetChild("Text3D"):GetComponent("Text3D")
-    text3D.text = localization:Get("lang")
-
-    -- A text on the button "Press this button" changes automatically
+    -- the button text "Press this button" and the Text3D change automatically.
 end

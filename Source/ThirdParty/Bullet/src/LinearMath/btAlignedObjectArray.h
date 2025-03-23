@@ -217,12 +217,15 @@ public:
 			{
 				reserve(newsize);
 			}
+
 #ifdef BT_USE_PLACEMENT_NEW
-			for (int i = curSize; i < newsize; i++)
+			// U3D fix : only placement new if newsize > 0
+			if (newsize)
 			{
-				new (&m_data[i]) T(fillData);
+				for (int i = curSize; i < newsize; i++)
+					new (&m_data[i]) T(fillData);
 			}
-#endif  //BT_USE_PLACEMENT_NEW
+#endif  //BT_USE_PLACEMENT_NEW			
 		}
 
 		m_size = newsize;
