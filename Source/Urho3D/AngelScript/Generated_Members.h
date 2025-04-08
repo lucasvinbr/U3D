@@ -21492,9 +21492,6 @@ template <class T> void RegisterMembers_TileMap2D(asIScriptEngine* engine, const
     // ResourceRef TileMap2D::GetTmxFileAttr() const
     engine->RegisterObjectMethod(className, "ResourceRef GetTmxFileAttr() const", AS_METHODPR(T, GetTmxFileAttr, () const, ResourceRef), AS_CALL_THISCALL);
 
-    // void TileMap2D::OnNodeSet(Node* node) override
-    engine->RegisterObjectMethod(className, "void OnNodeSet(Node@+)", AS_METHODPR(T, OnNodeSet, (Node*), void), AS_CALL_THISCALL);
-
     // virtual void Component::OnSetEnabled()
     engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
@@ -23213,6 +23210,7 @@ template <class T> void RegisterMembers_Text3D(asIScriptEngine* engine, const ch
     // bool Text3D::GetAutoLocalizable() const
     engine->RegisterObjectMethod(className, "bool GetAutoLocalizable() const", AS_METHODPR(T, GetAutoLocalizable, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_autoLocalizable() const", AS_METHODPR(T, GetAutoLocalizable, () const, bool), AS_CALL_THISCALL);
+
     // Vector2 Text3D::GetCharPosition(unsigned index)
     engine->RegisterObjectMethod(className, "Vector2 GetCharPosition(uint)", AS_METHODPR(T, GetCharPosition, (unsigned), Vector2), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector2 get_charPositions(uint)", AS_METHODPR(T, GetCharPosition, (unsigned), Vector2), AS_CALL_THISCALL);
@@ -23335,6 +23333,7 @@ template <class T> void RegisterMembers_Text3D(asIScriptEngine* engine, const ch
 
     // void Text3D::SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
     engine->RegisterObjectMethod(className, "void SetAlignment(HorizontalAlignment, VerticalAlignment)", AS_METHODPR(T, SetAlignment, (HorizontalAlignment, VerticalAlignment), void), AS_CALL_THISCALL);
+
     // void Text3D::SetAutoLocalizable(bool enable)
     engine->RegisterObjectMethod(className, "void SetAutoLocalizable(bool)", AS_METHODPR(T, SetAutoLocalizable, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_autoLocalizable(bool)", AS_METHODPR(T, SetAutoLocalizable, (bool), void), AS_CALL_THISCALL);
