@@ -129,7 +129,8 @@ else {
             enabled = false
         }
         println("the launcher-app build cannot be done with 'static' library type.")
-        println("To build it, type in a terminal : URHO3D_LIB_TYPE=SHARED ./gradlew build")
+        println("To build it, type in a terminal : URHO3D_LIB_TYPE=SHARED ./gradlew build (linux)")
+        println("                                  \$env:URHO3D_LIB_TYPE=\"SHARED\"; ./gradlew build (win)")
     }
 }
 

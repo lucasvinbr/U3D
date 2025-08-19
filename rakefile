@@ -732,10 +732,12 @@ end
 
 def app_cmake_lists_txt(name)
   <<-EOF
-set(TARGET_NAME #{name})
-define_source_files(GLOB_CPP_PATTERNS src/main/cpp/*.cpp GLOB_H_PATTERNS src/main/cpp/*.h RECURSE GROUP)
-setup_main_executable()
-setup_test()
+if (URHO3D_HOME)
+  set(TARGET_NAME #{name})
+  define_source_files(GLOB_CPP_PATTERNS src/main/cpp/*.cpp GLOB_H_PATTERNS src/main/cpp/*.h RECURSE GROUP)
+  setup_main_executable()
+  setup_test()
+endif ()
   EOF
 end
 

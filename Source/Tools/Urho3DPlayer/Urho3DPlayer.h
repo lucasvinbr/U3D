@@ -22,6 +22,11 @@
 
 #pragma once
 
+#ifdef URHO3D_ANGELSCRIPT
+#include <Urho3D/AngelScript/ScriptFile.h>
+#include <Urho3D/AngelScript/Script.h>
+#endif
+
 #include <Urho3D/Engine/Application.h>
 
 using namespace Urho3D;
