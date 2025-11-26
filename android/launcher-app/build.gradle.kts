@@ -135,5 +135,5 @@ else {
 }
 
 fun LibType(): String {
-    return System.getenv("URHO3D_LIB_TYPE")?.toLowerCase() ?: "static"
+    return System.getenv("URHO3D_LIB_TYPE")?.toLowerCase() ?: "shared"
 }
