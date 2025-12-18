@@ -33,14 +33,15 @@ val buildStagingDir: String by ext
 
 android {
     ndkVersion = ndkSideBySideVersion
-    compileSdkVersion(30)
+    compileSdk = 35
 
     // android : the launcher-app has always an shared build
     if (LibType() == "shared")
     {
         defaultConfig {
-            minSdkVersion(19)
-            targetSdkVersion(30)
+            minSdk = 23
+            targetSdk = 35
+			namespace = "io.urho3d.launcher"
             applicationId = "io.urho3d.launcher"
             versionCode = 1
             versionName = project.version.toString()
@@ -89,10 +90,16 @@ android {
         lintOptions {
             isAbortOnError = false
         }
+		compileOptions {
+			isCoreLibraryDesugaringEnabled = true
+			sourceCompatibility = JavaVersion.VERSION_17
+			targetCompatibility = JavaVersion.VERSION_17
+		}
     }
 }
 
 dependencies {
+	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
     implementation(project(":android:urho3d-lib"))
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")

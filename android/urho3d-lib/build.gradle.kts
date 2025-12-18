@@ -37,10 +37,11 @@ val buildStagingDir: String by ext
 
 android {
     ndkVersion = ndkSideBySideVersion
-    compileSdkVersion(30)
+    compileSdk = 35
     defaultConfig {
-        minSdkVersion(19)
-        targetSdkVersion(30)
+		namespace = "io.urho3d.lib"
+        minSdk = 23
+        targetSdk = 35
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -88,15 +89,21 @@ android {
     lintOptions {
         isAbortOnError = false
     }
+	compileOptions {
+		isCoreLibraryDesugaringEnabled = true
+		sourceCompatibility = JavaVersion.VERSION_17
+		targetCompatibility = JavaVersion.VERSION_17
+	}
 }
 
 dependencies {
+	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     implementation("com.getkeepsafe.relinker:relinker:1.4.2")
-    testImplementation("junit:junit:4.13.1")
-    androidTestImplementation("androidx.test:runner:1.3.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+//    testImplementation("junit:junit:4.13.1")
+//    androidTestImplementation("androidx.test:runner:1.3.0")
+//    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }
 
 android.libraryVariants.whenObjectAdded {
@@ -174,7 +181,7 @@ publishing {
 }
 
 fun LibType(): String {
-    return System.getenv("URHO3D_LIB_TYPE")?.toLowerCase() ?: "static"
+    return System.getenv("URHO3D_LIB_TYPE")?.toLowerCase() ?: "shared"
 }
 
 fun MavenPublication.configure(config: String) {

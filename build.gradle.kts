@@ -25,8 +25,8 @@ import org.gradle.internal.io.NullOutputStream
 import java.io.ByteArrayOutputStream
 
 buildscript {
-    extra["agpVersion"] = "4.2.0"
-    extra["kotlinVersion"] = "1.4.10"
+	extra["agpVersion"] = "8.10.1"
+	extra["kotlinVersion"] = "1.9.10"
     val agpVersion: String by extra
     val kotlinVersion: String by extra
     
@@ -70,9 +70,10 @@ allprojects {
 }
 
 tasks {
-    wrapper {
-        distributionType = Wrapper.DistributionType.ALL
-    }
+	wrapper {
+		gradleVersion = "7.5"
+		distributionType = Wrapper.DistributionType.ALL
+	}
     "prepareKotlinBuildScriptModel" {
         listOf("Debug", "Release").forEach {
             dependsOn(":android:urho3d-lib:generateJsonModel$it")

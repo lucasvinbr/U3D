@@ -87,11 +87,31 @@ else ()
     endif ()
 
     if (ANDROID)
+        message (STATUS "cmake build type: ${CMAKE_BUILD_TYPE}")
         string (TOLOWER ${CMAKE_BUILD_TYPE} config)
         if (BUILD_STAGING_DIR)
             # Another special case where library location is already known to be in the build tree of Urho3D project
+
+            # figure out if we appear to be using a newer version of the android gradle plugin:
+            #   newer versions of the AGP have a different structure inside the staging dir
             get_filename_component (BUILD_STAGING_DIR ${BUILD_STAGING_DIR}/cmake DIRECTORY)
-            set (URHO3D_HOME ${BUILD_STAGING_DIR}/cmake/${config}/${ANDROID_ABI})
+
+            if(EXISTS "${BUILD_STAGING_DIR}/cmake/")
+                set (URHO3D_HOME ${BUILD_STAGING_DIR}/cmake/${config}/${ANDROID_ABI})
+            else()
+                # assume newer AGP structure: $BUILD_STAGING_DIR/$CMAKE_BUILD_TYPE/$HASH/$ANDROID_ABI
+                set(BEFORE_HASH_DIR ${BUILD_STAGING_DIR}/${CMAKE_BUILD_TYPE})
+                file(GLOB build_children_dirs RELATIVE ${BEFORE_HASH_DIR} ${BEFORE_HASH_DIR}/*)
+                set(build_dirlist "")
+                foreach(child ${build_children_dirs})
+                    if(IS_DIRECTORY ${BEFORE_HASH_DIR}/${child})
+                        # I don't know if there's a way to find the most recent hash,
+                        # so we just use all of them and hope for the best
+                        message(STATUS "got child dir ${child}")
+                        set (URHO3D_HOME ${BEFORE_HASH_DIR}/${child}/${ANDROID_ABI})
+                    endif()
+                endforeach()
+            endif()
         elseif (JNI_DIR)
             # Using Urho3D AAR from Maven repository
             get_filename_component (JNI_DIR ${JNI_DIR}/urho3d DIRECTORY)
