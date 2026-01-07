@@ -53,10 +53,11 @@ android {
                         add("-D BUILD_STAGING_DIR=${findProject(":android:urho3d-lib")!!.projectDir}/$buildStagingDir/shared")
                         add("-D URHO3D_PLAYER=1")
                         add("-D URHO3D_SAMPLES=1")
+						add("-D URHO3D_LIB_TYPE=SHARED")
                         // Pass along matching env-vars as CMake build options
                         addAll(project.file("../../script/.build-options")
                             .readLines()
-                            .filterNot { listOf("URHO3D_PLAYER", "URHO3D_SAMPLES").contains(it) }
+                            .filterNot { listOf("URHO3D_PLAYER", "URHO3D_SAMPLES", "URHO3D_LIB_TYPE").contains(it) }
                             .mapNotNull { variable -> System.getenv(variable)?.let { "-D $variable=$it" } }
                         )
                     }

@@ -26,10 +26,11 @@ import java.io.ByteArrayOutputStream
 
 buildscript {
 	extra["agpVersion"] = "8.10.1"
-	extra["kotlinVersion"] = "1.9.10"
+	extra["kotlinVersion"] = "2.2.21"
+	extra["gradleVer"] = "8.11.1"
     val agpVersion: String by extra
     val kotlinVersion: String by extra
-    
+
     repositories {
         google()
         mavenCentral()
@@ -43,6 +44,7 @@ buildscript {
 
 val agpVersion: String by ext
 val kotlinVersion: String by ext
+val gradleVer: String by ext
 
 allprojects {
     group = "io.u3d"
@@ -60,8 +62,8 @@ allprojects {
     
     buildscript {
         ext {
-            set("agpVersion", "$agpVersion")
-            set("kotlinVersion", "$kotlinVersion")
+            set("agpVersion", agpVersion)
+            set("kotlinVersion", kotlinVersion)
             set("ndkSideBySideVersion", "21.4.7075529")
             set("cmakeVersion", "3.17.3+")
             set("buildStagingDir", ".cxx")
@@ -71,7 +73,7 @@ allprojects {
 
 tasks {
 	wrapper {
-		gradleVersion = "7.5"
+		gradleVersion = gradleVer
 		distributionType = Wrapper.DistributionType.ALL
 	}
     "prepareKotlinBuildScriptModel" {
