@@ -70,7 +70,7 @@ public:
     /// Check has animation.
     bool HasAnimation(const String& animationName) const;
 
-    /// Return sprite.
+    /// Return first sprite of spritesheet sprites, or nullptr.
     Sprite2D* GetSprite() const;
     /// Return sprites.
     const Vector<SharedPtr<Sprite2D>>& GetSprites() const;
