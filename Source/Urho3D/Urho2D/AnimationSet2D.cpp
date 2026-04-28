@@ -234,7 +234,7 @@ Sprite2D* AnimationSet2D::GetSpriteFromSpriteSheets (const String& name) const
 {
     Sprite2D* foundSprite = nullptr;
 
-    for(SharedPtr<SpriteSheet2D> spritesheet : spriteSheets_)
+    for(const SharedPtr<SpriteSheet2D>& spritesheet : spriteSheets_)
     {
         foundSprite = spritesheet->GetSprite(name);
 
