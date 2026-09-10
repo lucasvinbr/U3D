@@ -11,12 +11,12 @@
 //
 // Authors: Prashant Patil (Prashant.Patil@imgtec.com)
 
-#include "./dsp.h"
+#include "src/dsp/dsp.h"
 
 #if defined(WEBP_USE_MSA)
 
-#include "./lossless.h"
-#include "./msa_macro.h"
+#include "src/dsp/lossless.h"
+#include "src/dsp/msa_macro.h"
 
 #define TRANSFORM_COLOR_8(src0, src1, dst0, dst1, c0, c1, mask0, mask1) do {  \
   v8i16 g0, g1, t0, t1, t2, t3;                                               \
@@ -48,12 +48,12 @@
   dst = VSHF_UB(src, t0, mask1);                                \
 } while (0)
 
-static void TransformColor(const VP8LMultipliers* const m, uint32_t* data,
-                           int num_pixels) {
+static void TransformColor_MSA(const VP8LMultipliers* WEBP_RESTRICT const m,
+                               uint32_t* WEBP_RESTRICT data, int num_pixels) {
   v16u8 src0, dst0;
-  const v16i8 g2br = (v16i8)__msa_fill_w(m->green_to_blue_ |
-                                         (m->green_to_red_ << 16));
-  const v16i8 r2b = (v16i8)__msa_fill_w(m->red_to_blue_);
+  const v16i8 g2br = (v16i8)__msa_fill_w(m->green_to_blue |
+                                         (m->green_to_red << 16));
+  const v16i8 r2b = (v16i8)__msa_fill_w(m->red_to_blue);
   const v16u8 mask0 = { 1, 255, 1, 255, 5, 255, 5, 255, 9, 255, 9, 255,
                         13, 255, 13, 255 };
   const v16u8 mask1 = { 16, 1, 18, 3, 20, 5, 22, 7, 24, 9, 26, 11,
@@ -94,7 +94,8 @@ static void TransformColor(const VP8LMultipliers* const m, uint32_t* data,
   }
 }
 
-static void SubtractGreenFromBlueAndRed(uint32_t* argb_data, int num_pixels) {
+static void SubtractGreenFromBlueAndRed_MSA(uint32_t* argb_data,
+                                            int num_pixels) {
   int i;
   uint8_t* ptemp_data = (uint8_t*)argb_data;
   v16u8 src0, dst0, tmp0;
@@ -136,8 +137,8 @@ static void SubtractGreenFromBlueAndRed(uint32_t* argb_data, int num_pixels) {
 extern void VP8LEncDspInitMSA(void);
 
 WEBP_TSAN_IGNORE_FUNCTION void VP8LEncDspInitMSA(void) {
-  VP8LSubtractGreenFromBlueAndRed = SubtractGreenFromBlueAndRed;
-  VP8LTransformColor = TransformColor;
+  VP8LSubtractGreenFromBlueAndRed = SubtractGreenFromBlueAndRed_MSA;
+  VP8LTransformColor = TransformColor_MSA;
 }
 
 #else  // !WEBP_USE_MSA

@@ -24,12 +24,10 @@
 set (TARGET_NAME WebP)
 
 # Define source files
-define_source_files (RECURSE GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS src/*.h)
+define_source_files (RECURSE GLOB_CPP_PATTERNS src/*.c sharpyuv/*.c GLOB_H_PATTERNS src/*.h sharpyuv/*.h)
 
 # Define dependency libs
-if (ANDROID)
-    set (INCLUDE_DIRS ${ANDROID_NDK}/sources/android/cpufeatures)
-endif ()
+set (INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Setup target
 setup_library ()

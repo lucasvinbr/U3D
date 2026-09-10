@@ -1,0 +1,11 @@
+URL: https://gitlab.freedesktop.org/freetype/freetype
+Date: 06.09.2026
+https://github.com/freetype/freetype/releases/tag/VER-2-14-3
+
+Urho3D modifications, all in src/gzip/, to keep FreeType bundled zlib from
+clashing with the one Assimp bundles in contrib/zlib:
+1. ftzconf.h: "typedef unsigned char Byte" is unconditional, dropping the
+   upstream !defined(__MACTYPES__) guard.
+2. zutil.h: the diagnostic function block is #if 0 rather than ZLIB_DEBUG.
+3. zutil.c: the z_verbose and z_error definitions are #if 0 rather than
+   ZLIB_DEBUG.

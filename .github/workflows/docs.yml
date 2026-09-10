@@ -42,7 +42,7 @@ jobs:
             libdbus-1-dev libreadline6-dev libssl-dev libudev-dev uuid-dev
 
       - name: CMake
-        run: cmake -S . -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DURHO3D_LIB_TYPE=static -DURHO3D_DOCS=1 -DURHO3D_PLAYER=0 -DURHO3D_PROFILING=0 -DURHO3D_SAMPLES=0 -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+        run: cmake -S . -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DURHO3D_LIB_TYPE=static -DURHO3D_DEPLOYMENT_TARGET=generic -DURHO3D_DOCS=1 -DURHO3D_PLAYER=0 -DURHO3D_PROFILING=0 -DURHO3D_SAMPLES=0 -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
       - name: Build
         run: cmake --build build --parallel 2 --target all --config Release -- -j2

@@ -12,15 +12,15 @@
 // Author: mans@mansr.com (Mans Rullgard)
 // Based on SSE code by: somnath@google.com (Somnath Banerjee)
 
-#include "./dsp.h"
+#include "src/dsp/dsp.h"
 
 #if defined(WEBP_USE_NEON)
 
 #include <assert.h>
 #include <arm_neon.h>
 #include <string.h>
-#include "./neon.h"
-#include "./yuv.h"
+#include "src/dsp/neon.h"
+#include "src/dsp/yuv.h"
 
 #ifdef FANCY_UPSAMPLING
 
@@ -58,8 +58,9 @@
 } while (0)
 
 // Turn the macro into a function for reducing code-size when non-critical
-static void Upsample16Pixels(const uint8_t *r1, const uint8_t *r2,
-                             uint8_t *out) {
+static void Upsample16Pixels_NEON(const uint8_t* WEBP_RESTRICT const r1,
+                                  const uint8_t* WEBP_RESTRICT const r2,
+                                  uint8_t* WEBP_RESTRICT const out) {
   UPSAMPLE_16PIXELS(r1, r2, out);
 }
 
@@ -70,7 +71,7 @@ static void Upsample16Pixels(const uint8_t *r1, const uint8_t *r2,
   /* replicate last byte */                                             \
   memset(r1 + (num_pixels), r1[(num_pixels) - 1], 9 - (num_pixels));    \
   memset(r2 + (num_pixels), r2[(num_pixels) - 1], 9 - (num_pixels));    \
-  Upsample16Pixels(r1, r2, out);                                        \
+  Upsample16Pixels_NEON(r1, r2, out);                                   \
 }
 
 //-----------------------------------------------------------------------------
@@ -111,7 +112,7 @@ static const int16_t kCoeffs1[4] = { 19077, 26149, 6419, 13320 };
   vst4_u8(out, v255_r_g_b);                                             \
 } while (0)
 
-#if !defined(WEBP_SWAP_16BIT_CSP)
+#if (WEBP_SWAP_16BIT_CSP == 0)
 #define ZIP_U8(lo, hi) vzip_u8((lo), (hi))
 #else
 #define ZIP_U8(lo, hi) vzip_u8((hi), (lo))
@@ -189,67 +190,73 @@ static const int16_t kCoeffs1[4] = { 19077, 26149, 6419, 13320 };
   }                                                                     \
 }
 
-#define NEON_UPSAMPLE_FUNC(FUNC_NAME, FMT, XSTEP)                       \
-static void FUNC_NAME(const uint8_t *top_y, const uint8_t *bottom_y,    \
-                      const uint8_t *top_u, const uint8_t *top_v,       \
-                      const uint8_t *cur_u, const uint8_t *cur_v,       \
-                      uint8_t *top_dst, uint8_t *bottom_dst, int len) { \
-  int block;                                                            \
-  /* 16 byte aligned array to cache reconstructed u and v */            \
-  uint8_t uv_buf[2 * 32 + 15];                                          \
-  uint8_t *const r_uv = (uint8_t*)((uintptr_t)(uv_buf + 15) & ~15);     \
-  const int uv_len = (len + 1) >> 1;                                    \
-  /* 9 pixels must be read-able for each block */                       \
-  const int num_blocks = (uv_len - 1) >> 3;                             \
-  const int leftover = uv_len - num_blocks * 8;                         \
-  const int last_pos = 1 + 16 * num_blocks;                             \
-                                                                        \
-  const int u_diag = ((top_u[0] + cur_u[0]) >> 1) + 1;                  \
-  const int v_diag = ((top_v[0] + cur_v[0]) >> 1) + 1;                  \
-                                                                        \
-  const int16x4_t coeff1 = vld1_s16(kCoeffs1);                          \
-  const int16x8_t R_Rounder = vdupq_n_s16(-14234);                      \
-  const int16x8_t G_Rounder = vdupq_n_s16(8708);                        \
-  const int16x8_t B_Rounder = vdupq_n_s16(-17685);                      \
-                                                                        \
-  /* Treat the first pixel in regular way */                            \
-  assert(top_y != NULL);                                                \
-  {                                                                     \
-    const int u0 = (top_u[0] + u_diag) >> 1;                            \
-    const int v0 = (top_v[0] + v_diag) >> 1;                            \
-    VP8YuvTo ## FMT(top_y[0], u0, v0, top_dst);                         \
-  }                                                                     \
-  if (bottom_y != NULL) {                                               \
-    const int u0 = (cur_u[0] + u_diag) >> 1;                            \
-    const int v0 = (cur_v[0] + v_diag) >> 1;                            \
-    VP8YuvTo ## FMT(bottom_y[0], u0, v0, bottom_dst);                   \
-  }                                                                     \
-                                                                        \
-  for (block = 0; block < num_blocks; ++block) {                        \
-    UPSAMPLE_16PIXELS(top_u, cur_u, r_uv);                              \
-    UPSAMPLE_16PIXELS(top_v, cur_v, r_uv + 16);                         \
-    CONVERT2RGB_8(FMT, XSTEP, top_y, bottom_y, r_uv,                    \
-                  top_dst, bottom_dst, 16 * block + 1, 16);             \
-    top_u += 8;                                                         \
-    cur_u += 8;                                                         \
-    top_v += 8;                                                         \
-    cur_v += 8;                                                         \
-  }                                                                     \
-                                                                        \
-  UPSAMPLE_LAST_BLOCK(top_u, cur_u, leftover, r_uv);                    \
-  UPSAMPLE_LAST_BLOCK(top_v, cur_v, leftover, r_uv + 16);               \
-  CONVERT2RGB_1(VP8YuvTo ## FMT, XSTEP, top_y, bottom_y, r_uv,          \
-                top_dst, bottom_dst, last_pos, len - last_pos);         \
+#define NEON_UPSAMPLE_FUNC(FUNC_NAME, FMT, XSTEP)                              \
+static void FUNC_NAME(const uint8_t* WEBP_RESTRICT top_y,                      \
+                      const uint8_t* WEBP_RESTRICT bottom_y,                   \
+                      const uint8_t* WEBP_RESTRICT top_u,                      \
+                      const uint8_t* WEBP_RESTRICT top_v,                      \
+                      const uint8_t* WEBP_RESTRICT cur_u,                      \
+                      const uint8_t* WEBP_RESTRICT cur_v,                      \
+                      uint8_t* WEBP_RESTRICT top_dst,                          \
+                      uint8_t* WEBP_RESTRICT bottom_dst, int len) {            \
+  int block;                                                                   \
+  /* 16 byte aligned array to cache reconstructed u and v */                   \
+  uint8_t uv_buf[2 * 32 + 15];                                                 \
+  uint8_t* const r_uv = (uint8_t*)((uintptr_t)(uv_buf + 15) & ~(uintptr_t)15); \
+  const int uv_len = (len + 1) >> 1;                                           \
+  /* 9 pixels must be read-able for each block */                              \
+  const int num_blocks = (uv_len - 1) >> 3;                                    \
+  const int leftover = uv_len - num_blocks * 8;                                \
+  const int last_pos = 1 + 16 * num_blocks;                                    \
+                                                                               \
+  const int u_diag = ((top_u[0] + cur_u[0]) >> 1) + 1;                         \
+  const int v_diag = ((top_v[0] + cur_v[0]) >> 1) + 1;                         \
+                                                                               \
+  const int16x4_t coeff1 = vld1_s16(kCoeffs1);                                 \
+  const int16x8_t R_Rounder = vdupq_n_s16(-14234);                             \
+  const int16x8_t G_Rounder = vdupq_n_s16(8708);                               \
+  const int16x8_t B_Rounder = vdupq_n_s16(-17685);                             \
+                                                                               \
+  /* Treat the first pixel in regular way */                                   \
+  assert(top_y != NULL);                                                       \
+  {                                                                            \
+    const int u0 = (top_u[0] + u_diag) >> 1;                                   \
+    const int v0 = (top_v[0] + v_diag) >> 1;                                   \
+    VP8YuvTo ## FMT(top_y[0], u0, v0, top_dst);                                \
+  }                                                                            \
+  if (bottom_y != NULL) {                                                      \
+    const int u0 = (cur_u[0] + u_diag) >> 1;                                   \
+    const int v0 = (cur_v[0] + v_diag) >> 1;                                   \
+    VP8YuvTo ## FMT(bottom_y[0], u0, v0, bottom_dst);                          \
+  }                                                                            \
+                                                                               \
+  for (block = 0; block < num_blocks; ++block) {                               \
+    UPSAMPLE_16PIXELS(top_u, cur_u, r_uv);                                     \
+    UPSAMPLE_16PIXELS(top_v, cur_v, r_uv + 16);                                \
+    CONVERT2RGB_8(FMT, XSTEP, top_y, bottom_y, r_uv,                           \
+                  top_dst, bottom_dst, 16 * block + 1, 16);                    \
+    top_u += 8;                                                                \
+    cur_u += 8;                                                                \
+    top_v += 8;                                                                \
+    cur_v += 8;                                                                \
+  }                                                                            \
+                                                                               \
+  UPSAMPLE_LAST_BLOCK(top_u, cur_u, leftover, r_uv);                           \
+  UPSAMPLE_LAST_BLOCK(top_v, cur_v, leftover, r_uv + 16);                      \
+  CONVERT2RGB_1(VP8YuvTo ## FMT, XSTEP, top_y, bottom_y, r_uv,                 \
+                top_dst, bottom_dst, last_pos, len - last_pos);                \
 }
 
 // NEON variants of the fancy upsampler.
-NEON_UPSAMPLE_FUNC(UpsampleRgbLinePair,  Rgb,  3)
-NEON_UPSAMPLE_FUNC(UpsampleBgrLinePair,  Bgr,  3)
-NEON_UPSAMPLE_FUNC(UpsampleRgbaLinePair, Rgba, 4)
-NEON_UPSAMPLE_FUNC(UpsampleBgraLinePair, Bgra, 4)
-NEON_UPSAMPLE_FUNC(UpsampleArgbLinePair, Argb, 4)
-NEON_UPSAMPLE_FUNC(UpsampleRgba4444LinePair, Rgba4444, 2)
-NEON_UPSAMPLE_FUNC(UpsampleRgb565LinePair, Rgb565, 2)
+NEON_UPSAMPLE_FUNC(UpsampleRgbaLinePair_NEON, Rgba, 4)
+NEON_UPSAMPLE_FUNC(UpsampleBgraLinePair_NEON, Bgra, 4)
+#if !defined(WEBP_REDUCE_CSP)
+NEON_UPSAMPLE_FUNC(UpsampleRgbLinePair_NEON,  Rgb,  3)
+NEON_UPSAMPLE_FUNC(UpsampleBgrLinePair_NEON,  Bgr,  3)
+NEON_UPSAMPLE_FUNC(UpsampleArgbLinePair_NEON, Argb, 4)
+NEON_UPSAMPLE_FUNC(UpsampleRgba4444LinePair_NEON, Rgba4444, 2)
+NEON_UPSAMPLE_FUNC(UpsampleRgb565LinePair_NEON, Rgb565, 2)
+#endif   // WEBP_REDUCE_CSP
 
 //------------------------------------------------------------------------------
 // Entry point
@@ -259,17 +266,19 @@ extern WebPUpsampleLinePairFunc WebPUpsamplers[/* MODE_LAST */];
 extern void WebPInitUpsamplersNEON(void);
 
 WEBP_TSAN_IGNORE_FUNCTION void WebPInitUpsamplersNEON(void) {
-  WebPUpsamplers[MODE_RGB]  = UpsampleRgbLinePair;
-  WebPUpsamplers[MODE_RGBA] = UpsampleRgbaLinePair;
-  WebPUpsamplers[MODE_BGR]  = UpsampleBgrLinePair;
-  WebPUpsamplers[MODE_BGRA] = UpsampleBgraLinePair;
-  WebPUpsamplers[MODE_ARGB] = UpsampleArgbLinePair;
-  WebPUpsamplers[MODE_rgbA] = UpsampleRgbaLinePair;
-  WebPUpsamplers[MODE_bgrA] = UpsampleBgraLinePair;
-  WebPUpsamplers[MODE_Argb] = UpsampleArgbLinePair;
-  WebPUpsamplers[MODE_RGB_565] = UpsampleRgb565LinePair;
-  WebPUpsamplers[MODE_RGBA_4444] = UpsampleRgba4444LinePair;
-  WebPUpsamplers[MODE_rgbA_4444] = UpsampleRgba4444LinePair;
+  WebPUpsamplers[MODE_RGBA] = UpsampleRgbaLinePair_NEON;
+  WebPUpsamplers[MODE_BGRA] = UpsampleBgraLinePair_NEON;
+  WebPUpsamplers[MODE_rgbA] = UpsampleRgbaLinePair_NEON;
+  WebPUpsamplers[MODE_bgrA] = UpsampleBgraLinePair_NEON;
+#if !defined(WEBP_REDUCE_CSP)
+  WebPUpsamplers[MODE_RGB]  = UpsampleRgbLinePair_NEON;
+  WebPUpsamplers[MODE_BGR]  = UpsampleBgrLinePair_NEON;
+  WebPUpsamplers[MODE_ARGB] = UpsampleArgbLinePair_NEON;
+  WebPUpsamplers[MODE_Argb] = UpsampleArgbLinePair_NEON;
+  WebPUpsamplers[MODE_RGB_565] = UpsampleRgb565LinePair_NEON;
+  WebPUpsamplers[MODE_RGBA_4444] = UpsampleRgba4444LinePair_NEON;
+  WebPUpsamplers[MODE_rgbA_4444] = UpsampleRgba4444LinePair_NEON;
+#endif   // WEBP_REDUCE_CSP
 }
 
 #endif  // FANCY_UPSAMPLING

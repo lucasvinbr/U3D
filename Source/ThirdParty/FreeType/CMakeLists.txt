@@ -35,14 +35,15 @@ set (SOURCE_FILES
     src/autofit/autofit.c
     src/base/ftbase.c
     src/base/ftbbox.c
+    src/base/ftbdf.c
     src/base/ftbitmap.c
-    src/base/ftfntfmt.c
+    src/base/ftcid.c
+    src/base/ftdebug.c
     src/base/ftfstype.c
     src/base/ftgasp.c
     src/base/ftglyph.c
     src/base/ftgxval.c
     src/base/ftinit.c
-    src/base/ftlcdfil.c
     src/base/ftmm.c
     src/base/ftotval.c
     src/base/ftpatent.c
@@ -65,10 +66,12 @@ set (SOURCE_FILES
     src/pfr/pfr.c
     src/psaux/psaux.c
     src/pshinter/pshinter.c
-    src/psnames/psmodule.c
+    src/psnames/psnames.c
     src/raster/raster.c
+    src/sdf/sdf.c
     src/sfnt/sfnt.c
     src/smooth/smooth.c
+    src/svg/svg.c
     src/truetype/truetype.c
     src/type1/type1.c
     src/type42/type42.c
