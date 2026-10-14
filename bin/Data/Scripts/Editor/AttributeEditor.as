@@ -93,7 +93,6 @@ UIElement@ CreateAttributeEditorParentWithSeparatedLabel(ListView@ list, const S
         editorParent.AddChild(attrNameText);
         attrNameText.style = "EditorAttributeText";
         attrNameText.text = name;
-
         attrNameText.enabled = true;
 
         SubscribeToEvent(attrNameText,"ClickEnd", "HandleAttributeEditorAttrNameClick");
